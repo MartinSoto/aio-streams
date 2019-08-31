@@ -1,0 +1,25 @@
+version: '3.5'
+
+services:
+  devshell:
+    image: aiohttp-fastproxy-devshell
+    build:
+      context: .
+    volumes:
+      - ${PWD}/..:${PWD}/..
+      - ~:/root/hosthome
+      - /var/run/docker.sock:/var/run/docker.sock
+      - vscode-data:/root/.vscode-server
+      - user-persistent-data:/root/.persistent-data
+    environment:
+      SHELL: /bin/bash
+      HISTFILE: /root/.persistent-data/bash_history
+      VIRTUALENVWRAPPER_PYTHON: /usr/bin/python3
+    command: sleep infinity
+
+volumes:
+  vscode-data:
+    name: python-vscode-data
+
+  user-persistent-data:
+    name: python-user-persistent-data

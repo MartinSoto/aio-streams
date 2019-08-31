@@ -1,0 +1,28 @@
+{
+    "name": "aio streams",
+    "dockerComposeFile": [
+        "docker-compose.yml"
+    ],
+    "settings": {
+        "python.pythonPath": "/usr/bin/python3",
+        "python.formatting.provider": "yapf",
+        "python.testing.pytestArgs": [
+            "tests"
+        ],
+        "python.testing.unittestEnabled": false,
+        "python.testing.nosetestsEnabled": false,
+        "python.testing.pytestEnabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.linting.mypyEnabled": true
+    },
+    "extensions": [
+        "eamodio.gitlens",
+        "humao.rest-client",
+        "JanBn.git-last-commit-message",
+        "ms-azuretools.vscode-docker",
+        "ms-python.python",
+        "VisualStudioExptTeam.vscodeintellicode"
+    ],
+    "service": "devshell",
+    "shutdownAction": "stopCompose"
+}

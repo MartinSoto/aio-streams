@@ -1,0 +1,8 @@
+aiochan==0.2.6
+aiohttp-devtools==0.13.1
+aiohttp==3.5.4
+flake8==3.7.8
+mypy==0.720
+pytest-asyncio==0.10.0
+pytest==5.0.1
+yapf==0.28.0
