@@ -12,9 +12,8 @@ async def producer(c):
         still_open = await c.put('product ' + str(i))
         if not still_open:
             await asyncio.sleep(0.5)
-            print(
-                f'product {i} produced but never delivered, producer goes home now'
-            )
+            print(f'product {i} produced but never delivered, producer goes '
+                  'home now')
             break
         else:
             print(f"product {i} delivered")
