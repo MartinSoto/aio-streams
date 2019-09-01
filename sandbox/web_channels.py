@@ -2,7 +2,6 @@ import asyncio
 import itertools
 import logging
 import signal
-from typing import Optional
 
 import aiochan as ac
 import aiohttp
@@ -25,19 +24,71 @@ async def salutate_the_world(in_chan: ac.Chan) -> None:
         if out_chan is None:
             break
 
+        # It takes some consideration to salutate properly...
+        await asyncio.sleep(0.2)
         await out_chan.put(salutations[i % len(salutations)])
 
 
-async def hello(request: web.Request) -> web.StreamResponse:
+async def salutation_handler(request: web.Request) -> web.StreamResponse:
     salutate_chan: ac.Chan = request.app['salutate_chan']
     salutation_chan = ac.Chan()
     await salutate_chan.put(salutation_chan)
     return web.Response(text=await salutation_chan.get())
 
 
+MSG_TYPE_NAMES = {
+    aiohttp.WSMsgType.BINARY: "BINARY",
+    aiohttp.WSMsgType.CLOSE: "CLOSE",
+    aiohttp.WSMsgType.CLOSED: "CLOSED",
+    aiohttp.WSMsgType.CLOSING: "CLOSING",
+    aiohttp.WSMsgType.CONTINUATION: "CONTINUATION",
+    aiohttp.WSMsgType.ERROR: "ERROR",
+    aiohttp.WSMsgType.PING: "PING",
+    aiohttp.WSMsgType.PONG: "PONG",
+    aiohttp.WSMsgType.TEXT: "TEXT",
+}
+
+
+async def websocket_send_from_chan(chan: ac.Chan,
+                                   ws_response: web.WebSocketResponse):
+    async for msg in chan:
+        print(msg)
+        await ws_response.send_str(msg)
+
+
+async def websocket_handler(request: web.Request) -> web.StreamResponse:
+    salutate_chan: ac.Chan = request.app['salutate_chan']
+    salutation_chan = ac.Chan()
+
+    response = web.WebSocketResponse()
+    await response.prepare(request)
+
+    ac.go(websocket_send_from_chan(salutation_chan, response))
+
+    while True:
+        msg = await response.receive()
+
+        if msg.type not in (aiohttp.WSMsgType.TEXT, aiohttp.WSMsgType.BINARY):
+            break
+
+        print(f"Message received: {MSG_TYPE_NAMES[msg.type]}")
+        await salutate_chan.put(salutation_chan)
+
+    if msg.type == aiohttp.WSMsgType.ERROR:
+        print('ws connection closed with exception %s' % response.exception())
+
+    print(f"Connection ended with message {MSG_TYPE_NAMES[msg.type]}")
+
+    salutation_chan.close()
+
+    return response
+
+
 def create_app() -> web.Application:
     app = web.Application()
-    app.add_routes([web.get('/', hello)])
+    app.add_routes(
+        [web.get('/', salutation_handler),
+         web.get('/ws', websocket_handler)])
     return app
 
 
