@@ -2,6 +2,7 @@ import asyncio
 import itertools
 import logging
 import signal
+from typing import Optional
 
 import aiochan as ac
 import aiohttp
@@ -14,7 +15,7 @@ logging.basicConfig(
 )
 
 
-async def salutate_the_world(in_chan):
+async def salutate_the_world(in_chan: ac.Chan) -> None:
     salutations = [
         "Hello, world!", "Hallo, Welt!", "Hola Mundo", "Salut Monde !",
         "Ciao mondo!"
@@ -40,13 +41,19 @@ def create_app() -> web.Application:
     return app
 
 
-async def main(host='0.0.0.0', port=8080):
+async def main(host: str = '0.0.0.0', port: int = 8080) -> None:
     loop = asyncio.get_running_loop()
     main_task = asyncio.current_task(loop)
     signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+
+    def signal_handler(s):
+        asyncio.create_task(shutdown(s, loop, main_task))
+
     for s in signals:
         loop.add_signal_handler(
-            s, lambda s=s: asyncio.create_task(shutdown(s, loop, main_task)))
+            s,
+            lambda s=s, loop=loop, main_task=main_task: asyncio.create_task(
+                shutdown(s, loop, main_task)))
 
     salutate_chan = ac.Chan()
     salutate_task = ac.go(salutate_the_world(salutate_chan))
@@ -73,7 +80,7 @@ async def main(host='0.0.0.0', port=8080):
         await terminate_outstanding_tasks()
 
 
-async def terminate_outstanding_tasks():
+async def terminate_outstanding_tasks() -> None:
     outstanding_tasks = [
         t for t in asyncio.all_tasks() if t is not asyncio.current_task()
     ]
@@ -86,7 +93,7 @@ async def terminate_outstanding_tasks():
     await asyncio.gather(*outstanding_tasks, return_exceptions=True)
 
 
-async def shutdown(signal, loop: asyncio.BaseEventLoop,
+async def shutdown(signal, loop: asyncio.AbstractEventLoop,
                    main_task: asyncio.Task):
     logging.info(f"Received exit signal {signal.name}...")
 
