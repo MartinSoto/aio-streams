@@ -1,6 +1,6 @@
 version: '3.5'
-
 services:
+
   devshell:
     image: aiohttp-fastproxy-devshell
     build:
@@ -23,3 +23,7 @@ volumes:
 
   user-persistent-data:
     name: python-user-persistent-data
+
+networks:
+  default:
+    name: aio-streams-network

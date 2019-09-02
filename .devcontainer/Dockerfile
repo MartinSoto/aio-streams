@@ -4,7 +4,8 @@ FROM martinsoto/aio-streams as runtime
 FROM martinsoto/devshell-python
 
 RUN apt-get update && \
-        apt-get -y install \
+        DEBIAN_FRONTEND=noninteractive apt-get -y install \
+        kafkacat \
         libbz2-1.0 \
         liblz4-1 \
         librocksdb5.17 \
