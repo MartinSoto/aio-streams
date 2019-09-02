@@ -1,4 +1,4 @@
-FROM aio-streams as runtime
+FROM martinsoto/aio-streams as runtime
 
 
 FROM martinsoto/devshell-python
@@ -12,8 +12,8 @@ RUN apt-get update && \
         libzip5
 COPY --from=runtime /usr/local/lib/python3.7/dist-packages /usr/local/lib/python3.7/dist-packages/
 
-COPY requirements.txt /tmp/requirements.txt
-RUN pip3 install -r /tmp/requirements.txt && \
-        rm /tmp/requirements.txt
+COPY dev-requirements.txt /tmp/dev-requirements.txt
+RUN pip3 install -r /tmp/dev-requirements.txt && \
+        rm /tmp/dev-requirements.txt
 
 RUN echo 'if [ -f ~/hosthome/.devshell/init.sh ]; then source ~/hosthome/.devshell/init.sh; fi' >> /root/.bashrc

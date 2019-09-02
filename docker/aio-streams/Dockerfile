@@ -26,7 +26,9 @@ RUN apt-get -y install \
         python3-dev \
         python3-pip
 
-RUN pip3 install python-rocksdb
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install -r /tmp/requirements.txt && \
+        rm /tmp/requirements.txt
 
 
 FROM base
