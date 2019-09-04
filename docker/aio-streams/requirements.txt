@@ -1,3 +1,4 @@
 aiochan==0.2.6
 aiohttp==3.5.4
+aiokafka==0.5.2
 python-rocksdb==0.7.0
