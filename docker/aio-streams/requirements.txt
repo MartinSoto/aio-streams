@@ -1,5 +1,8 @@
 aiochan==0.2.6
 aiohttp==3.5.4
 aiokafka==0.5.2
+Hypercorn==0.8.2
 python-rocksdb==0.7.0
+Quart-Trio==0.4.0
+Quart==0.10.0
 trio==0.12.1
