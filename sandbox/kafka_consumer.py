@@ -5,10 +5,16 @@ from datetime import datetime
 
 from aiokafka import AIOKafkaConsumer
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s,%(msecs)d %(levelname)s: %(message)s",
+    datefmt="%H:%M:%S",
+)
+
 loop = asyncio.get_event_loop()
 
 
-async def consume():
+async def consume() -> None:
     main_task = asyncio.current_task(loop)
     signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
 
@@ -20,6 +26,7 @@ async def consume():
             s,
             lambda s=s, loop=loop, main_task=main_task: asyncio.create_task(
                 shutdown(s, loop, main_task)))
+
     consumer = AIOKafkaConsumer('salutations',
                                 loop=loop,
                                 bootstrap_servers='kafka:9092',
@@ -41,7 +48,7 @@ async def consume():
 
 
 async def shutdown(signal, loop: asyncio.AbstractEventLoop,
-                   main_task: asyncio.Task):
+                   main_task: asyncio.Task) -> None:
     logging.info(f"Received exit signal {signal.name}...")
 
     logging.info("Starting graceful shutdown")
