@@ -5,4 +5,5 @@ Hypercorn==0.8.2
 python-rocksdb==0.7.0
 Quart-Trio==0.4.0
 Quart==0.10.0
+https://github.com/python-trio/trio-asyncio/archive/master.zip
 trio==0.12.1
