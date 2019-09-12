@@ -17,7 +17,7 @@ logging.basicConfig(
 async def consume(send_channel: trio.MemorySendChannel) -> None:
     loop = asyncio.get_event_loop()
 
-    consumer = AIOKafkaConsumer('salutations',
+    consumer = AIOKafkaConsumer('salutation-requests',
                                 loop=loop,
                                 bootstrap_servers='kafka:9092',
                                 group_id="salutated",
@@ -28,9 +28,7 @@ async def consume(send_channel: trio.MemorySendChannel) -> None:
     try:
         logging.info("Consumer started")
         async for msg in consumer:
-            # yapf: disable
             await loop.run_trio(lambda msg=msg: send_channel.send(msg))
-            # yapf: enable
     except asyncio.CancelledError:
         pass
     finally:
