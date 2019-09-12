@@ -24,13 +24,11 @@ send_channel: trio.abc.SendChannel = None
 
 @app.route('/<salutation>')
 async def hello(salutation: str) -> quart.Response:
-    async def gen_response():
-        await trio.sleep(5.0)
-        await send_channel.send(f"I send an S.O.S. to the world: {salutation}")
-        logging.info("Writing message")
-        yield f'S.O.S.: {salutation}'.encode('utf-8')
+    await trio.sleep(10.0)
+    await send_channel.send(f"I send an S.O.S. to the world: {salutation}")
+    logging.info("Writing message")
 
-    response = await quart.make_response(gen_response())
+    response = await quart.make_response(f'S.O.S.: {salutation}')
     response.timeout = None
     return response
 
