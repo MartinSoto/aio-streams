@@ -8,6 +8,7 @@ import trio_asyncio
 from aiokafka import AIOKafkaProducer
 from hypercorn.config import Config
 from hypercorn.trio import serve
+import quart
 
 warnings.filterwarnings("ignore", category=trio.TrioDeprecationWarning)
 
@@ -22,10 +23,16 @@ send_channel: trio.abc.SendChannel = None
 
 
 @app.route('/<salutation>')
-async def hello(salutation: str) -> str:
-    # await trio.sleep(5.0)
-    await send_channel.send(f"I send an S.O.S. to the world: {salutation}")
-    return f'S.O.S.: {salutation}'
+async def hello(salutation: str) -> quart.Response:
+    async def gen_response():
+        await trio.sleep(5.0)
+        await send_channel.send(f"I send an S.O.S. to the world: {salutation}")
+        logging.info("Writing message")
+        yield f'S.O.S.: {salutation}'.encode('utf-8')
+
+    response = await quart.make_response(gen_response())
+    response.timeout = None
+    return response
 
 
 @trio_asyncio.trio2aio
@@ -47,7 +54,9 @@ async def send_to_kafka(receive_channel: trio.abc.ReceiveChannel) -> None:
 
 async def serve_web():
     config = Config()
+    config.use_reloader = True
     config.bind = ["localhost:8080"]
+    config.keep_alive_timeout = 3600
     await serve(app, config)
 
 
