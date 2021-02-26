@@ -1,5 +1,5 @@
 aiochan==0.2.6
-aiohttp==3.5.4
+aiohttp==3.7.4
 aiokafka==0.5.2
 Hypercorn==0.8.2
 python-rocksdb==0.7.0
